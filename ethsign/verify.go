@@ -7,17 +7,18 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-type hash uint8
+type sigProvider uint8
 
+// sig provider
 const (
-	TextHash  hash = 1
-	Keccak256 hash = 2
+	Metamask sigProvider = 1
+	GoEth    sigProvider = 2
 )
 
-func Verify(originalMessage string, signature string, signerAddress string, algoHash hash) (bool, error) {
+func Verify(originalMessage string, signature string, signerAddress string, sigProv sigProvider) (bool, error) {
 	var recovered *ecdsa.PublicKey
-	switch algoHash {
-	case TextHash:
+	switch sigProv {
+	case Metamask:
 		hashByte := accounts.TextHash([]byte(originalMessage))
 		signatureBytes, err := hexutil.Decode(signature)
 		if err != nil {
@@ -30,7 +31,7 @@ func Verify(originalMessage string, signature string, signerAddress string, algo
 		if err != nil {
 			return false, err
 		}
-	case Keccak256:
+	case GoEth:
 		hash := crypto.Keccak256Hash([]byte(originalMessage))
 		signatureBytes, err := hexutil.Decode(signature)
 		if err != nil {
